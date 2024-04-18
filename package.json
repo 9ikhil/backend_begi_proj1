@@ -1,0 +1,15 @@
+{
+  "name": "backend_tuto4",
+  "version": "1.0.0",
+  "description": "a beginner freindly project in backend",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "node",
+    "backend"
+  ],
+  "author": "Nikhil kumar",
+  "license": "ISC"
+}
