@@ -2,8 +2,9 @@ import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
+const SALT_ROUNDS = 10;
 
-const userSchema = new Schema(
+const userSchema = new mongoose.Schema(
     {
         username: {
             type: String,
@@ -35,7 +36,7 @@ const userSchema = new Schema(
         },
         watchHistory: [
             {
-                type: Schema.Types.ObjectId,
+                type:mongoose.Schema.Types.ObjectId,
                 ref: "Video"
             }
         ],
@@ -54,9 +55,9 @@ const userSchema = new Schema(
 )
 
 userSchema.pre("save", async function(next){
-    if(!this.ismodified("password")) return next()
+    if(!this.isModified("password")) return next()
 
-    this.password = bcrypt.hash(this.password , defaultValue)
+    this.password = bcrypt.hash(this.password , SALT_ROUNDS)
     next()
 })
 
