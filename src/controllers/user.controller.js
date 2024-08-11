@@ -39,16 +39,20 @@ const registerUser = asyncHandler(async (req , res ) =>{
         throw new ApiError(409, "User already exists")
     }
 
-
+    
     //4check for images . check for avatar images
     const avatarLocalPath = req.files?.avatar[0]?.path;
     const coverImagePath = req.files?.coverImage[0].path;
+    
+    console.log("req.files", req.files);
+    console.log("avatarLocalPath", avatarLocalPath);
     
     if(!avatarLocalPath) {
         throw new ApiError(400, "Please provide an avatar image")
     }
   
     const avatar = await uploadOnCloudinary(avatarLocalPath)
+    console.log("avatar",avatar);
     const coverImage = await uploadOnCloudinary(coverImagePath)
 
     if(!avatar) {
