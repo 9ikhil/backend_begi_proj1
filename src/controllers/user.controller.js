@@ -5,6 +5,7 @@ import {uploadOnCloudinary} from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/ApiResponse.js";
 
 
+
 const registerUser = asyncHandler(async (req , res ) =>{
     
     //algorithm for the user registration and validation
@@ -39,30 +40,41 @@ const registerUser = asyncHandler(async (req , res ) =>{
         throw new ApiError(409, "User already exists")
     }
 
+    
+    // req.files?.avatar[0] can cause errors as req.file?.avatar give undefined if not present and undefined[0] will throw error so fixed it
+    
+
 
     //4check for images . check for avatar images
     const avatarLocalPath = req.files?.avatar[0]?.path;
     const coverImagePath = req.files?.coverImage[0].path;
     
-    if(!avatarLocalPath) {
-        throw new ApiError(400, "Please provide an avatar image")
-    }
-  
+
+    
+
+    
+    const isAvatarPresent = req.files?.avatar;
+    console.log(isAvatarPresent)
+    // if (!isAvatarPresent) {
+    //     throw new ApiError(409, "provide an avatar file")
+    // }
+
+
     const avatar = await uploadOnCloudinary(avatarLocalPath)
     const coverImage = await uploadOnCloudinary(coverImagePath)
 
-    if(!avatar) {
-        throw new ApiError(400 ,  "avatar file is required ")
+    // if(!avatar) {
+    //     throw new ApiError(400 ,  "avatar file is required ")
 
-    }
+    // }   x
    
     // entry in database
     const user = await User.create({
         fullName ,
-        avatar : avatar.url,
+        avatar : avatar?.url || "",
         coverImage : coverImage?.url || "" ,
         email,
-        username : username.toLowerCase() , 
+        username  , 
         password
     })
 
@@ -82,23 +94,6 @@ const registerUser = asyncHandler(async (req , res ) =>{
     return res.status(201).json(
         new ApiResponse(200 , createdUser ,  "user registered successfully")
     )
-
-
-
-
-
-    
-    
-
-
-
-
-
-
-
-
-
-
 
 
 })
