@@ -8,7 +8,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 
 const registerUser = asyncHandler(async (req , res ) =>{
     
-    //algorithm for the user registration and validation
+    //1algorithm for the user registration and validation
     //1.get user details from frontend
     //2validation :_ should not be empty
     //3check if user is already registered
@@ -41,32 +41,30 @@ const registerUser = asyncHandler(async (req , res ) =>{
     }
 
     
-    // req.files?.avatar[0] can cause errors as req.file?.avatar give undefined if not present and undefined[0] will throw error so fixed it
-    
 
 
     //4check for images . check for avatar images
     const avatarLocalPath = req.files?.avatar[0]?.path;
-    const coverImagePath = req.files?.coverImage[0].path;
-    
+    let coverImageLocalPath;
+    if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
+        coverImageLocalPath = req.files.coverImage[0].path
+    }    
 
     
 
     
-    const isAvatarPresent = req.files?.avatar;
-    console.log(isAvatarPresent)
-    // if (!isAvatarPresent) {
-    //     throw new ApiError(409, "provide an avatar file")
-    // }
+    if (!avatarLocalPath ) {
+        throw new ApiError(409, "provide an avatar file")
+    }
 
 
     const avatar = await uploadOnCloudinary(avatarLocalPath)
-    const coverImage = await uploadOnCloudinary(coverImagePath)
+    const coverImage = await uploadOnCloudinary(coverImageLocalPath)
 
-    // if(!avatar) {
-    //     throw new ApiError(400 ,  "avatar file is required ")
+    if(!avatar) {
+        throw new ApiError(400 ,  "avatar file is required ")
 
-    // }   x
+    }   
    
     // entry in database
     const user = await User.create({
@@ -83,8 +81,7 @@ const registerUser = asyncHandler(async (req , res ) =>{
     //remove the password and refresh token 
     const createdUser = await User.findById(user._id).select(
         "-password -refreshToken" //string contains entry which we dont need in the database
-    )
-
+    )   
     // check for user creatinon
     if(!createdUser){
         throw new ApiError(500, "something went wrong while registring the user")
@@ -97,6 +94,8 @@ const registerUser = asyncHandler(async (req , res ) =>{
 
 
 })
+
+
 
 
 export {registerUser}
